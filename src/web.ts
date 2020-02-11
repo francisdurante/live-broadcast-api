@@ -5,11 +5,11 @@ export class LiveBroadcastPluginWeb extends WebPlugin implements LiveBroadcastPl
   constructor() {
     super({
       name: 'LiveBroadcastPlugin',
-      platforms: ['web']
+      platforms: ['web','android']
     });
   }
 
-  async echo(options: { value: string }): Promise<{value: string}> {
+  async callLive(options: { value: string }): Promise<{value: string}> {
     console.log('ECHO', options);
     return options;
   }

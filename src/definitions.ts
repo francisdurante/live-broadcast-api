@@ -5,5 +5,5 @@ declare module "@capacitor/core" {
 }
 
 export interface LiveBroadcastPluginPlugin {
-  echo(options: { value: string }): Promise<{value: string}>;
+  callLive(options: { value: string }): Promise<{value: string}>;
 }
