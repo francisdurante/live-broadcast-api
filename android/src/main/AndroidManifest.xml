@@ -20,11 +20,12 @@
 			<activity android:name="com.live.broadcast.plugin.MainActivity"/>
 			 <activity android:name="com.live.broadcast.plugin.liveVideoBroadcaster.LiveVideoBroadcasterActivity"
 				android:configChanges="orientation|keyboardHidden|screenSize"
+				android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
 				/>
 			<activity android:name="com.live.broadcast.plugin.liveVideoPlayer.LiveVideoPlayerActivity"
 				/>
 
-			<service android:name="com.live.broadcast.plugin.LiveVideoBroadcaster" />
+			<service android:name="io.antmedia.android.broadcaster.LiveVideoBroadcaster" />
 		</application>
   </manifest>
   

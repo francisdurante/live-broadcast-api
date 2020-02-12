@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.renderscript.Sampler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -31,9 +32,19 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.getcapacitor.JSObject;
 import com.live.broadcast.plugin.LiveBroadcastPlugin;
 import com.live.broadcast.plugin.livebroadcastplugin.R;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -43,6 +54,8 @@ import io.antmedia.android.broadcaster.LiveVideoBroadcaster;
 import io.antmedia.android.broadcaster.utils.Resolution;
 
 import static com.live.broadcast.plugin.MainActivity.RTMP_BASE_URL;
+import static com.live.broadcast.plugin.MainActivity.SERVER_IP;
+import static com.live.broadcast.plugin.MainActivity.SERVER_PORT;
 
 public class LiveVideoBroadcasterActivity extends AppCompatActivity {
 
@@ -50,17 +63,28 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
     private static final String TAG = LiveVideoBroadcasterActivity.class.getSimpleName();
     private ViewGroup mRootView;
     boolean mIsRecording = false;
-    private EditText mStreamNameEditText;
+    private TextView mStreamNameEditText;
+    private TextView mStreamLiveEditID;
     private Timer mTimer;
+    private Timer mTimerWatcher;
     private long mElapsedTime;
+    private TextView mWatcherStatus;
     public TimerHandler mTimerHandler;
     private ImageButton mSettingsButton;
     private CameraResolutionsFragment mCameraResolutionsDialog;
     private Intent mLiveVideoBroadcasterServiceIntent;
     private TextView mStreamLiveStatus;
+
     private GLSurfaceView mGLView;
     private ILiveVideoBroadcaster mLiveVideoBroadcaster;
     private Button mBroadcastControlButton;
+
+    private int peakWatcher = 0;
+
+  public static final String REQUEST_METHOD = "GET";
+  public static final int READ_TIMEOUT = 15000;
+  public static final int CONNECTION_TIMEOUT = 15000;
+  private String mStreamId ;
 
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -87,9 +111,10 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Bundle bundle = getIntent().getExtras();
         // Hide title
         //requestWindowFeature(Window.FEATURE_NO_TITLE);
+        mStreamId = bundle.getString("streamName");
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
@@ -101,12 +126,16 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_live_video_broadcaster);
 
         mTimerHandler = new TimerHandler();
-        mStreamNameEditText = (EditText) findViewById(R.id.stream_name_edit_text);
 
+        mStreamNameEditText = (TextView) findViewById(R.id.stream_name_edit_text);
+        mStreamLiveEditID = findViewById(R.id.stream_name_edit_text_id);
+        mStreamNameEditText.setEnabled(false);
+        mStreamNameEditText.setText(bundle.getString("streamName"));
+        mStreamLiveEditID.setText(getString(R.string.your_id ) + " ");
         mRootView = (ViewGroup)findViewById(R.id.root_layout);
         mSettingsButton = (ImageButton)findViewById(R.id.settings_button);
         mStreamLiveStatus = (TextView) findViewById(R.id.stream_live_status);
-
+        mWatcherStatus = (TextView) findViewById(R.id.stream_watcher);
         mBroadcastControlButton = (Button) findViewById(R.id.toggle_broadcasting);
 
         // Configure the GLSurfaceView.  This will start the Renderer thread, with an
@@ -186,7 +215,7 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
         if (mCameraResolutionsDialog != null && mCameraResolutionsDialog.isVisible()) {
             mCameraResolutionsDialog.dismiss();
         }
-        mLiveVideoBroadcaster.pause();
+        if(mLiveVideoBroadcaster != null) mLiveVideoBroadcaster.pause();
     }
 
 
@@ -235,8 +264,7 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
         {
             if (mLiveVideoBroadcaster != null) {
                 if (!mLiveVideoBroadcaster.isConnected()) {
-                    String streamName = mStreamNameEditText.getText().toString();
-                    LiveBroadcastPlugin.returnResponse(streamName,true);
+                    final String streamName = mStreamNameEditText.getText().toString();
                     new AsyncTask<String, String, Boolean>() {
                         ContentLoadingProgressBar
                                 progressBar;
@@ -258,10 +286,12 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
                             mIsRecording = result;
                             if (result) {
                                 mStreamLiveStatus.setVisibility(View.VISIBLE);
+                                mWatcherStatus.setVisibility(View.VISIBLE);
 
                                 mBroadcastControlButton.setText(R.string.stop_broadcasting);
                                 mSettingsButton.setVisibility(View.GONE);
                                 startTimer();//start the recording duration
+                                startTimerWatcher(streamName);
                             }
                             else {
                                 Snackbar.make(mRootView, R.string.stream_not_started, Snackbar.LENGTH_LONG).show();
@@ -286,17 +316,84 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
 
     }
 
+    public void getStatistic(String id) {
+        String url = "http://" + SERVER_IP + ":" + SERVER_PORT + "/LiveApp/rest/v2/broadcasts/"+id+"/broadcast-statistics";
+        new AsyncTask<String, String, String>(){
+          String result;
+          String inputLine;
+          @Override
+          protected String doInBackground(String... urls) {
+            try {
+              URL myUrl = new URL(urls[0]);
+              HttpURLConnection connection =(HttpURLConnection)
+              myUrl.openConnection();
+              connection.setRequestMethod(REQUEST_METHOD);
+              connection.setReadTimeout(READ_TIMEOUT);
+              connection.setConnectTimeout(CONNECTION_TIMEOUT);
+              connection.connect();
+
+              //Create a new InputStreamReader
+              InputStreamReader streamReader = new
+                InputStreamReader(connection.getInputStream());
+              //Create a new buffered reader and String Builder
+              BufferedReader reader = new BufferedReader(streamReader);
+              StringBuilder stringBuilder = new StringBuilder();
+              //Check if the line we are reading is not null
+              while((inputLine = reader.readLine()) != null){
+                stringBuilder.append(inputLine);
+              }
+              //Close our InputStream and Buffered reader
+              reader.close();
+              streamReader.close();
+              //Set our result equal to our stringBuilder
+              result = stringBuilder.toString();
+
+            } catch(IOException e){
+              e.printStackTrace();
+              result = null;
+            }
+            return  result;
+          }
+
+          @Override
+          protected void onPostExecute(String result) {
+            try {
+              JSONObject obj = new JSONObject(result);
+              mWatcherStatus.setText(obj.getString("totalHLSWatchersCount"));
+              if(Integer.parseInt(obj.getString("totalHLSWatchersCount")) > peakWatcher){
+                peakWatcher = Integer.parseInt(mWatcherStatus.toString());
+              }
+            } catch (JSONException e) {
+              e.printStackTrace();
+            }
+
+
+            // Call activity method with results);
+          }
+        }.execute(url);
+
+  }
+
 
     public void triggerStopRecording() {
         if (mIsRecording) {
             mBroadcastControlButton.setText(R.string.start_broadcasting);
 
             mStreamLiveStatus.setVisibility(View.GONE);
+            mWatcherStatus.setVisibility(View.GONE);
             mStreamLiveStatus.setText(R.string.live_indicator);
             mSettingsButton.setVisibility(View.VISIBLE);
-
             stopTimer();
             mLiveVideoBroadcaster.stopBroadcasting();
+            JSObject response = new JSObject();
+          try {
+            response.putSafe("peakWatcher",peakWatcher);
+            response.putSafe("streamId",mStreamId);
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
+            LiveBroadcastPlugin.returnResponse(response,true);
+            finish();
         }
 
         mIsRecording = false;
@@ -315,13 +412,25 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
             public void run() {
                 mElapsedTime += 1; //increase every sec
                 mTimerHandler.obtainMessage(TimerHandler.INCREASE_TIMER).sendToTarget();
-
                 if (mLiveVideoBroadcaster == null || !mLiveVideoBroadcaster.isConnected()) {
                     mTimerHandler.obtainMessage(TimerHandler.CONNECTION_LOST).sendToTarget();
                 }
             }
         }, 0, 1000);
     }
+  public void startTimerWatcher(final String name) {
+
+    if(mTimerWatcher == null) {
+      mTimerWatcher = new Timer();
+    }
+
+    mTimerWatcher.scheduleAtFixedRate(new TimerTask() {
+
+      public void run() {
+        getStatistic(name);
+      }
+    }, 0, 5000);
+  }
 
 
     public void stopTimer()
@@ -329,8 +438,12 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
         if (mTimer != null) {
             this.mTimer.cancel();
         }
+        if (mTimerWatcher != null) {
+          this.mTimerWatcher.cancel();
+        }
         this.mTimer = null;
         this.mElapsedTime = 0;
+        this.mTimerWatcher = null;
     }
 
     public void setResolution(Resolution size) {
@@ -344,7 +457,7 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case INCREASE_TIMER:
-                    mStreamLiveStatus.setText(getString(R.string.live_indicator) + " - " + getDurationString((int) mElapsedTime));
+                    mStreamLiveStatus.setText(getString(R.string.live_indicator) + " : " + getDurationString((int) mElapsedTime));
                     break;
                 case CONNECTION_LOST:
                     triggerStopRecording();
@@ -357,6 +470,7 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
             }
         }
     }
+
 
     public static String getDurationString(int seconds) {
 
