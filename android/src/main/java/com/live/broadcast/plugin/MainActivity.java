@@ -14,12 +14,18 @@ public class MainActivity extends AppCompatActivity {
     /**
      * PLEASE WRITE RTMP BASE URL of the your RTMP SERVER.
      */
-    public static final String RTMP_BASE_URL = "rtmp://192.168.1.101/LiveApp/";
+    public static final String SERVER_IP = "192.168.1.101";
+    public static final String SERVER_PORT = "5080";
+    public static final String RTMP_BASE_URL = "rtmp://"+ SERVER_IP +"/LiveApp/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+      super.onCreate(savedInstanceState);
+      Intent i = new Intent(this, LiveVideoBroadcasterActivity.class);
+      Bundle bundle = getIntent().getExtras();
+      i.putExtra("streamName",bundle.getString("streamName"));
+      startActivity(i);
+      finish();
     }
 
     public void openVideoBroadcaster(View view) {
