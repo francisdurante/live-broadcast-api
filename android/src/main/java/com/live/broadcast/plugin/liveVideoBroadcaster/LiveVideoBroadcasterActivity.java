@@ -77,7 +77,7 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
 
     private GLSurfaceView mGLView;
     private ILiveVideoBroadcaster mLiveVideoBroadcaster;
-    private Button mBroadcastControlButton;
+    private ImageButton mBroadcastControlButton;
 
     private int peakWatcher = 0;
 
@@ -136,7 +136,7 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
         mSettingsButton = (ImageButton)findViewById(R.id.settings_button);
         mStreamLiveStatus = (TextView) findViewById(R.id.stream_live_status);
         mWatcherStatus = (TextView) findViewById(R.id.stream_watcher);
-        mBroadcastControlButton = (Button) findViewById(R.id.toggle_broadcasting);
+        mBroadcastControlButton = (ImageButton) findViewById(R.id.toggle_broadcasting);
 
         // Configure the GLSurfaceView.  This will start the Renderer thread, with an
         // appropriate EGL activity.
@@ -249,7 +249,7 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
 
         if (sizeList != null && sizeList.size() > 0) {
             mCameraResolutionsDialog = new CameraResolutionsFragment();
-
+            System.out.println(sizeList + " aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
             mCameraResolutionsDialog.setCameraResolutions(sizeList, mLiveVideoBroadcaster.getPreviewSize());
             mCameraResolutionsDialog.show(ft, "resolutiton_dialog");
         }
@@ -288,7 +288,8 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
                                 mStreamLiveStatus.setVisibility(View.VISIBLE);
                                 mWatcherStatus.setVisibility(View.VISIBLE);
 
-                                mBroadcastControlButton.setText(R.string.stop_broadcasting);
+//                                mBroadcastControlButton.setText(R.string.stop_broadcasting);
+                                mBroadcastControlButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_button));
                                 mSettingsButton.setVisibility(View.GONE);
                                 startTimer();//start the recording duration
                                 startTimerWatcher(streamName);
@@ -359,9 +360,9 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
           protected void onPostExecute(String result) {
             try {
               JSONObject obj = new JSONObject(result);
-              mWatcherStatus.setText(obj.getString("totalHLSWatchersCount"));
+              mWatcherStatus.setText(" " + obj.getString("totalHLSWatchersCount"));
               if(Integer.parseInt(obj.getString("totalHLSWatchersCount")) > peakWatcher){
-                peakWatcher = Integer.parseInt(mWatcherStatus.toString());
+                peakWatcher = Integer.parseInt(mWatcherStatus.getText().toString());
               }
             } catch (JSONException e) {
               e.printStackTrace();
@@ -377,7 +378,8 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
 
     public void triggerStopRecording() {
         if (mIsRecording) {
-            mBroadcastControlButton.setText(R.string.start_broadcasting);
+//            mBroadcastControlButton.setText(R.string.start_broadcasting);
+            mBroadcastControlButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_record_button));
 
             mStreamLiveStatus.setVisibility(View.GONE);
             mWatcherStatus.setVisibility(View.GONE);
@@ -457,7 +459,7 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case INCREASE_TIMER:
-                    mStreamLiveStatus.setText(getString(R.string.live_indicator) + " : " + getDurationString((int) mElapsedTime));
+                    mStreamLiveStatus.setText(getString(R.string.live_indicator) + "   •   " + getDurationString((int) mElapsedTime));
                     break;
                 case CONNECTION_LOST:
                     triggerStopRecording();

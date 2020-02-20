@@ -16,7 +16,9 @@ public class LiveBroadcastPlugin extends Plugin {
     @PluginMethod()
     public void callLive(PluginCall call) {
         response = call;
+        String streamName = call.getString("streamName");
         Intent intent = new Intent(getContext(),MainActivity.class);
+        intent.putExtra("streamName",streamName);
         getContext().startActivity(intent);
     }
 
