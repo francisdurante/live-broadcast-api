@@ -1,6 +1,6 @@
 {
   "name": "live-broadcast-plugin",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Broadcast live",
   "main": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",

@@ -249,7 +249,6 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
 
         if (sizeList != null && sizeList.size() > 0) {
             mCameraResolutionsDialog = new CameraResolutionsFragment();
-            System.out.println(sizeList + " aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
             mCameraResolutionsDialog.setCameraResolutions(sizeList, mLiveVideoBroadcaster.getPreviewSize());
             mCameraResolutionsDialog.show(ft, "resolutiton_dialog");
         }
@@ -362,7 +361,7 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
               JSONObject obj = new JSONObject(result);
               mWatcherStatus.setText(" " + obj.getString("totalHLSWatchersCount"));
               if(Integer.parseInt(obj.getString("totalHLSWatchersCount")) > peakWatcher){
-                peakWatcher = Integer.parseInt(mWatcherStatus.getText().toString());
+                peakWatcher = Integer.parseInt(obj.getString("totalHLSWatchersCount"));
               }
             } catch (JSONException e) {
               e.printStackTrace();
