@@ -61,4 +61,6 @@
 
     <string name="sample_list_load_error">One or more sample lists failed to load</string>
     <string name="stream_not_started">Failed to start. Please check server url and security credentials.</string>
+    <string name="cancel">Dont Save</string>
+    <string name="save_message_live">Do you want to post your Live Video?</string>
 </resources>

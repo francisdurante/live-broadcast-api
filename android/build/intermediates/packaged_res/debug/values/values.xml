@@ -11,6 +11,7 @@
     <string name="broadcast_connection_lost">Connection to media server is lost</string>
     <string name="camera_not_running_properly">Camera is not running properly</string>
     <string name="camera_permission_is_required">Camera permission is required to run this app</string>
+    <string name="cancel">Dont Save</string>
     <string name="enable_random_adaptation">Enable random adaptation</string>
     <string name="error_drm_not_supported">Protected content not supported on API levels below 18</string>
     <string name="error_drm_unknown">An unknown DRM error occurred</string>
@@ -21,7 +22,7 @@
     <string name="error_querying_decoders">Unable to query device decoders</string>
     <string name="error_unsupported_audio">Media includes audio tracks, but none are playable by this device</string>
     <string name="error_unsupported_video">Media includes video tracks, but none are playable by this device</string>
-    <string name="live_indicator">on-air</string>
+    <string name="live_indicator">LIVE</string>
     <string name="low_bandwidth">Network speed is low. Latency is increasing.</string>
     <string name="microphone_permission_is_required">Microphone permission is required to run this app</string>
     <string name="my_string">Just a simple string</string>
@@ -33,6 +34,7 @@
     <string name="restart">Restart</string>
     <string name="retry">Retry</string>
     <string name="sample_list_load_error">One or more sample lists failed to load</string>
+    <string name="save_message_live">Do you want to post your Live Video?</string>
     <string name="selection_default">Default</string>
     <string name="selection_default_none">Default (none)</string>
     <string name="selection_disabled">Disabled</string>
@@ -45,16 +47,23 @@
     <string name="text">Text</string>
     <string name="unexpected_intent_action">Unexpected intent action: <ns1:g id="action">%1$s</ns1:g></string>
     <string name="video">Video</string>
+    <string name="your_id">Your Live ID : </string>
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+        
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
     <style name="AppThemeDark" parent="Theme.AppCompat.NoActionBar">
-        <!-- Customize your theme here. -->
+        
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+    <style name="Theme.AppCompat.Light.NoActionBar.FullScreen" parent="@style/Theme.AppCompat.Light.NoActionBar">
+    <item name="android:windowNoTitle">true</item>
+    <item name="android:windowActionBar">false</item>
+    <item name="android:windowFullscreen">true</item>
+    <item name="android:windowContentOverlay">@null</item>
+  </style>
 </resources>

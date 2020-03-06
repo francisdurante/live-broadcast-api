@@ -34,6 +34,7 @@ import android.widget.TextView;
 
 import com.getcapacitor.JSObject;
 import com.live.broadcast.plugin.LiveBroadcastPlugin;
+import com.live.broadcast.plugin.MainActivity;
 import com.live.broadcast.plugin.livebroadcastplugin.R;
 
 import org.json.JSONException;
@@ -390,11 +391,11 @@ public class LiveVideoBroadcasterActivity extends AppCompatActivity {
           try {
             response.putSafe("peakWatcher",peakWatcher);
             response.putSafe("streamId",mStreamId);
+            LiveBroadcastPlugin.showPopup(this,new AlertDialog.Builder(this).create(),response);
           } catch (JSONException e) {
             e.printStackTrace();
           }
-            LiveBroadcastPlugin.returnResponse(response,true);
-            finish();
+//            finish();
         }
 
         mIsRecording = false;

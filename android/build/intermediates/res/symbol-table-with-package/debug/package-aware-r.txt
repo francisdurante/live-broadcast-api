@@ -1053,15 +1053,21 @@ drawable exo_notification_small_icon
 drawable exo_notification_stop
 drawable googleg_disabled_color_18
 drawable googleg_standard_color_18
+drawable ic_eye
 drawable ic_mtrl_chip_checked_black
 drawable ic_mtrl_chip_checked_circle
 drawable ic_mtrl_chip_close_circle
+drawable ic_record_button
 drawable ic_settings_white_24dp
+drawable ic_stop_button
+drawable ic_switch_camera
 drawable ic_switch_camera_white_24dp
 drawable ic_transparent
+drawable ic_view_icon
 drawable mtrl_snackbar_background
 drawable mtrl_tabs_default_indicator
 drawable navigation_empty_icon
+drawable new_background_color_gradient
 drawable notification_action_background
 drawable notification_bg
 drawable notification_bg_low
@@ -1074,7 +1080,10 @@ drawable notification_template_icon_bg
 drawable notification_template_icon_low_bg
 drawable notification_tile_bg
 drawable notify_panel_notification_icon_bg
+drawable rounded_button_orange
+drawable rounded_button_white
 drawable rounded_live
+drawable test
 drawable tooltip_frame_dark
 drawable tooltip_frame_light
 id action0
@@ -1127,6 +1136,7 @@ id coordinator
 id custom
 id customPanel
 id dark
+id data_usage_message
 id debug_text_view
 id decor_content_parent
 id default_activity_button
@@ -1135,6 +1145,7 @@ id design_menu_item_action_area
 id design_menu_item_action_area_stub
 id design_menu_item_text
 id design_navigation_view
+id dont_save
 id edit_query
 id end
 id end_padder
@@ -1175,6 +1186,7 @@ id icon
 id icon_group
 id icon_only
 id image
+id imageView1
 id info
 id italic
 id item_touch_helper_previous_elevation
@@ -1184,6 +1196,8 @@ id left
 id light
 id line1
 id line3
+id linearLayout
+id linearLayout1
 id listMode
 id list_item
 id masked
@@ -1215,6 +1229,7 @@ id right_icon
 id right_side
 id root
 id root_layout
+id save
 id save_image_matrix
 id save_non_transition_alpha
 id save_scale_type
@@ -1250,6 +1265,8 @@ id start
 id status_bar_latest_event_content
 id stream_live_status
 id stream_name_edit_text
+id stream_name_edit_text_id
+id stream_watcher
 id stretch
 id submenuarrow
 id submit_area
@@ -1280,7 +1297,6 @@ id transition_layout_save
 id transition_position
 id transition_scene_layoutid_cache
 id transition_transform
-id transparent_cover
 id uniform
 id unlabeled
 id up
@@ -1367,6 +1383,7 @@ layout exo_player_view
 layout exo_simple_player_view
 layout exo_track_selection_dialog
 layout layout_camera_resolutions
+layout live_pop_up
 layout mtrl_layout_snackbar
 layout mtrl_layout_snackbar_include
 layout notification_action
@@ -1436,6 +1453,7 @@ string broadcast_connection_lost
 string camera_error
 string camera_not_running_properly
 string camera_permission_is_required
+string cancel
 string character_counter_content_description
 string character_counter_pattern
 string common_google_play_services_enable_button
@@ -1526,6 +1544,7 @@ string request_permission
 string restart
 string retry
 string sample_list_load_error
+string save_message_live
 string search_menu_title
 string selection_default
 string selection_default_none
@@ -1540,6 +1559,7 @@ string streaming_not_finished
 string text
 string unexpected_intent_action
 string video
+string your_id
 style AlertDialog_AppCompat
 style AlertDialog_AppCompat_Light
 style Animation_AppCompat_Dialog
@@ -1902,6 +1922,7 @@ style Theme_AppCompat_Light_DialogWhenLarge
 style Theme_AppCompat_Light_Dialog_Alert
 style Theme_AppCompat_Light_Dialog_MinWidth
 style Theme_AppCompat_Light_NoActionBar
+style Theme_AppCompat_Light_NoActionBar_FullScreen
 style Theme_AppCompat_NoActionBar
 style Theme_Design
 style Theme_Design_BottomSheetDialog
